@@ -32,6 +32,8 @@ def solve_gogen(possible_positions, connections):
         for l in possible_positions:
             if len(possible_positions[l]) == 1:
                 for ll in possible_positions:
+                    if ll == l:
+                        continue
                     old_len = len(possible_positions[ll])
                     possible_positions[ll] = possible_positions[ll].difference(possible_positions[l])
                     if len(possible_positions[ll]) != old_len:
@@ -58,13 +60,13 @@ def solve_gogen(possible_positions, connections):
     min_length = 1000
     best_l = None
     for l in possible_positions:
-        if len(possible_positions[l]) < min_length:
+        if len(possible_positions[l]) < min_length and len(possible_positions[l]) != 1:
             min_length = len(possible_positions[l])
             best_l = l
     
-    pos_list = possible_positions[best_l]
-    for p in pos_list:
-        possible_positions[best_l] = [p]
+    pos_set = possible_positions[best_l]
+    for p in pos_set:
+        possible_positions[best_l] = {p}
         if solve_gogen(possible_positions, connections):
             return True
         
