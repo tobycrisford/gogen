@@ -81,11 +81,7 @@ def solve_gogen(possible_positions_arg, connections):
         
     return solutions
 
-
-if __name__ == "__main__":
-
-    start_letters = input("Enter 9 starting letters from left-right top-bottom, separated by space:").split(" ")
-    words = input("Enter words, lowercase, separated by space:").split(" ")
+def parse_gogen_inputs(start_letters, words):
 
     possible_positions = {}
     possible_positions[start_letters[0]] = {(0,0)}
@@ -112,7 +108,10 @@ if __name__ == "__main__":
         for i in range(len(word)-1):
             connections.append((word[i],word[i+1]))
 
-    solutions = solve_gogen(possible_positions, connections)
+    return possible_positions, connections
+
+def print_solutions(solutions):
+
     if len(solutions) == 0:
         print("No solution exists")
     for sol in solutions:
@@ -120,3 +119,13 @@ if __name__ == "__main__":
         for i in range(5):
             print('   '.join([pos_to_letter[(i,j)] for j in range(5)]))
         print("----------")
+
+if __name__ == "__main__":
+
+    start_letters = input("Enter 9 starting letters from left-right top-bottom, separated by space:").split(" ")
+    words = input("Enter words, lowercase, separated by space:").split(" ")
+
+    possible_positions, connections = parse_gogen_inputs(start_letters, words)
+
+    solutions = solve_gogen(possible_positions, connections)
+    print_solutions(solutions)
