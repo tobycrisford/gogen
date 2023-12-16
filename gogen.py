@@ -1,5 +1,12 @@
 import string
 
+def copy_positions(possible_positions):
+    pos_copy = {}
+    for l in possible_positions:
+        pos_copy[l] = {p for p in possible_positions[l]}
+
+    return pos_copy
+
 def neighbours_single(position):
 
     result = set()
@@ -24,8 +31,10 @@ def neighbours(positions):
 
     return result
 
-def solve_gogen(possible_positions, connections):
+def solve_gogen(possible_positions_arg, connections):
 
+    possible_positions = copy_positions(possible_positions_arg)
+    
     while True:
         changed = False
 
@@ -46,7 +55,7 @@ def solve_gogen(possible_positions, connections):
             possible_positions[c[0]] = neighbours(possible_positions[c[1]]).intersection(possible_positions[c[0]])
 
             if len(possible_positions[c[0]]) == 0 or len(possible_positions[c[1]]) == 0:
-                return False
+                return []
             
             if any(len(possible_positions[c[i]]) != old_lens[i] for i in (0,1)):
                 changed = True
@@ -55,7 +64,7 @@ def solve_gogen(possible_positions, connections):
             break
 
     if all(len(possible_positions[l]) == 1 for l in possible_positions):
-        return True
+        return [{l: tuple(possible_positions[l])[0] for l in possible_positions}]
     
     min_length = 1000
     best_l = None
@@ -64,13 +73,13 @@ def solve_gogen(possible_positions, connections):
             min_length = len(possible_positions[l])
             best_l = l
     
+    solutions = []
     pos_set = possible_positions[best_l]
     for p in pos_set:
         possible_positions[best_l] = {p}
-        if solve_gogen(possible_positions, connections):
-            return True
+        solutions += solve_gogen(possible_positions, connections)
         
-    return False
+    return solutions
 
 
 if __name__ == "__main__":
@@ -103,10 +112,11 @@ if __name__ == "__main__":
         for i in range(len(word)-1):
             connections.append((word[i],word[i+1]))
 
-    solution_exists = solve_gogen(possible_positions, connections)
-    if solution_exists:
-        pos_to_letter = {list(possible_positions[l])[0]: l for l in possible_positions}
+    solutions = solve_gogen(possible_positions, connections)
+    if len(solutions) == 0:
+        print("No solution exists")
+    for sol in solutions:
+        pos_to_letter = {sol[l]: l for l in sol}
         for i in range(5):
             print('   '.join([pos_to_letter[(i,j)] for j in range(5)]))
-    else:
-        print("No solution exists")
+        print("----------")
